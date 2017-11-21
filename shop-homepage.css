@@ -3,13 +3,241 @@
  * Copyright 2013-2017 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-shop-homepage/blob/master/LICENSE)
  */
+@media (max-width: @screen-xs) {
+    body{font-size: 10px;}
+}
 
-body {
-  padding-top: 54px;
+@media (max-width: @screen-sm) {
+    body{font-size: 14px;}
+}
+
+
+h5{
+    font-size: 1.4em;
 }
 
 @media (min-width: 992px) {
-  body {
-    padding-top: 56px;
-  }
+    body {
+        padding-top: 0px;
+        padding-right: 0px;
+    }
 }
+
+@media (min-width: 1200px) {
+    .bt_header {
+        font-size: 14px;
+        display: inline-block;
+        padding: 0 10px;
+        height: 68px;
+        line-height: 70px;
+        color: #FFF;
+        font-family: museo7, Helvetica, sans-serif;
+        transition: .5s;
+    }
+
+    a.bt_header:hover {
+        color: #27aae1;
+    }
+
+    .nav-item a.onn {
+        color: #27aae1;
+    }
+
+    .bt_logo {
+        padding-top: 5px;
+        margin-left: 10px;
+        width: 250px;
+        height: 53px;
+        display: block;
+        float: left
+    }
+
+    .bt_title {
+        float: left;
+        font-size: 14px;
+        color: #fff;
+    }
+    .bt_letslog {
+        height: 68px;
+        line-height: 68px;
+        float: right;
+        position: relative
+    }
+
+    .bt_logpro {
+        padding: 10px 20px;
+        border-radius: 2px;
+        color: #fff;
+        font-size: 14px;
+        line-height: normal;
+        background-color: #27aae1;
+        border-bottom: 3px solid #1891c4;
+        transition: .5s;
+        font-family: museo3
+    }
+
+    #header .letslog .logpro:hover {
+        background-color: #22B9DF
+    }
+}
+
+@media (min-width: 576px) {
+    .bt_header_sm {
+        font-size: 2.15rem;
+        line-height: 2rem;
+        color: #FFF;
+        font-family: museo7, Helvetica, sans-serif;
+        transition: .5s;
+    }
+    .bt_header_sm_2 {
+        font-size: 2.10rem;
+        line-height: 2rem;
+        color: #FFF;
+        font-family: museo7, Helvetica, sans-serif;
+        transition: .5s;
+    }
+    .bt_header_sm_3 {
+        font-size: 2rem;
+        line-height: 2rem;
+        color: #FFF;
+        font-family: museo7, Helvetica, sans-serif;
+        transition: .5s;
+    }
+
+    .bt_logo_sm {
+        padding-top: 5px;
+        margin-left: 10px;
+        width: 375px;
+        height: 80px;
+        display: block;
+        float: left
+    }
+
+    .bt_title_num {
+        /*//padding-top: 10px;*/
+        font-size: 2rem;
+        line-height: 2rem;;
+        vertical-align: middle;
+        height: 100%;
+        color: #fff;
+    }
+
+    .bt_padding_sm {
+        padding-top: 5%;
+        padding-bottom: 5%;
+    }
+
+    .bt_title_sm {
+        /*float: left;*/
+        font-family: museo7, Helvetica, sans-serif;
+        font-size: 2rem;
+        line-height: 2rem;
+        color: #fff;
+        transition: .5s;
+    }
+    .bt_letslog_sm {
+        height: 102px;
+        line-height: 102px;
+        position: relative
+    }
+
+    .bt_logpro_sm {
+        padding: 10px 20px;
+        border-radius: 2px;
+        color: #fff;
+        font-size: 2.15rem;
+        line-height: 2rem;
+        line-height: normal;
+        background-color: #27aae1;
+        border-bottom: 3px solid #1891c4;
+        transition: .5s;
+        font-family: museo3
+    }
+
+    .bt_logpro_sm_2 {
+        padding: 10px 20px;
+        border-radius: 2px;
+        color: #fff;
+        font-size: 2.15rem;
+        line-height: 2rem;
+        line-height: normal;
+        background-color: #27aae1;
+        border-bottom: 3px solid #1891c4;
+        transition: .5s;
+        font-family: museo3
+    }
+    .bt_margin1{
+        margin-bottom: 10%;
+    }
+    .bt_margin2{
+        margin-bottom: 5%;
+    }
+    .bt_margin3{
+        margin-bottom: 1%;
+        margin-top: 1%;
+    }
+    .bt_back{
+        z-index: -1;
+        background: url(/public/images/home/img11.jpg) center;
+    }
+    .bt_header1{
+        color: #fff;
+        font-family: museo9;
+        text-shadow: 1px 1px 1px #000;
+    }
+    .bt_caption{
+        background-color: rgba(0, 0, 0, .6);
+        z-index: 10;
+        color: #fff;
+        font-family: museo3;
+    }
+    .bt_what{
+        background-image: url(/public/images/frontend/search-logo.png);
+
+        background-repeat: no-repeat;
+        margin:0;
+        padding:0;
+        -webkit-background-size: auto; /* pour anciens Chrome et Safari */
+        background-size: auto; /* version standardisée */
+    }
+
+
+}
+
+.bt_white {
+    color: #fff;
+}
+
+
+.bt_phonewhite {
+    background-position: 21px -19px;
+    padding: 0 10px 0 50px;
+    /*margin-right: -25px;*/
+    background-image: url(/public/images/frontend/phone.png);
+    height: 25px;
+    float: left;
+    text-align: left;
+    display: block;
+    background-repeat: no-repeat;
+}
+
+.col-centered {
+    float: none;
+    margin: 0 auto;
+}
+
+.col-right {
+    float: right;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.bt_black_05 {
+    background-color: rgba(0, 0, 0, .5);
+}
+
+.bt_black_03 {
+    background-color: rgba(0, 0, 0, .3);
+}
+
+
