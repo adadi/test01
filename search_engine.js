@@ -41,7 +41,7 @@ $(function () {
     $("#arti_quoi").catcomplete({
         autoFocus: !0, delay: 25, source: function (e, a) {
             var i = e.term;
-            return i in t ? void a(t[i]) : void $.post("/index/metier", {req: e.term}, function (e) {
+            return i in t ? void a(t[i]) : void $.post("https://www.helloartisan.com/index/metier", {req: e.term}, function (e) {
                 0 == e.res.length && r ? t[i] = e.res : (r = t[i] = e.res, a(e.res))
             }, "json")
         }, select: function (e, t) {
@@ -52,7 +52,7 @@ $(function () {
     $("#arti_ou").autocomplete({
         autoFocus: !0, delay: 25, source: function (e, t) {
             var a = e.term;
-            return a in i ? void t(i[a]) : void $.post("/index/ville", {req: e.term}, function (e) {
+            return a in i ? void t(i[a]) : void $.post("https://www.helloartisan.com/index/ville", {req: e.term}, function (e) {
                 var r = $.map(e.res, function (e) {
                     var t = e.label;
                     return "" != e.n && (t += " (" + e.n + ")"), {label: t, value: t, id: e.id}
@@ -107,7 +107,7 @@ $(function () {
     $("#bt_arti_quoi").catcomplete({
         autoFocus: !0, delay: 25, source: function (e, a) {
             var i = e.term;
-            return i in t ? void a(t[i]) : void $.post("/index/metier", {req: e.term}, function (e) {
+            return i in t ? void a(t[i]) : void $.post("https://www.helloartisan.com/index/metier", {req: e.term}, function (e) {
                 0 == e.res.length && r ? t[i] = e.res : (r = t[i] = e.res, a(e.res))
             }, "json")
         }, select: function (e, t) {
@@ -125,7 +125,7 @@ $(function () {
     $("#bt_arti_ou").autocomplete({
         autoFocus: !0, delay: 25, source: function (e, t) {
             var a = e.term;
-            return a in i ? void t(i[a]) : void $.post("/index/ville", {req: e.term}, function (e) {
+            return a in i ? void t(i[a]) : void $.post("https://www.helloartisan.com/index/ville", {req: e.term}, function (e) {
                 var r = $.map(e.res, function (e) {
                     var t = e.label;
                     return "" != e.n && (t += " (" + e.n + ")"), {label: t, value: t, id: e.id}
