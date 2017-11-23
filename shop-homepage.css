@@ -195,7 +195,7 @@
 
     .bt_back {
         z-index: -1;
-        background: url('/public/images/home/img11.jpg') center;
+        background: url('https://www.helloartisan.com/public/images/home/img11.jpg') center;
     }
 
     .bt_header1 {
@@ -212,7 +212,7 @@
     }
 
     .bt_what {
-        background-image: url(/public/images/frontend/search-logo.png);
+        background-image: url(https://www.helloartisan.com/public/images/frontend/search-logo.png);
 
         background-repeat: no-repeat;
         margin: 0;
@@ -222,7 +222,7 @@
     }
 
     .bt_input_large {
-        background-image: url(/public/images/frontend/search-logo.png) no-repeat;
+        background-image: url(https://www/public/images/frontend/search-logo.png) no-repeat;
         font-size: 3rem;
         line-height: 3;
         display: -ms-flexbox;
@@ -358,7 +358,7 @@
     background-position: 21px -19px;
     padding: 0 10px 0 50px;
     /*margin-right: -25px;*/
-    background-image: url(/public/images/frontend/phone.png);
+    background-image: url(https://www.helloartisan.com/public/images/frontend/phone.png);
     height: 25px;
     float: left;
     text-align: left;
