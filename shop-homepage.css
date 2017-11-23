@@ -3,23 +3,16 @@
  * Copyright 2013-2017 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-shop-homepage/blob/master/LICENSE)
  */
-@media (max-width: @screen-xs) {
-    body{font-size: 10px;}
-}
-
-@media (max-width: @screen-sm) {
-    body{font-size: 14px;}
-}
-
-
-h5{
-    font-size: 1.4em;
-}
 
 @media (min-width: 992px) {
     body {
-        padding-top: 0px;
-        padding-right: 0px;
+        padding-top: 0px !important;
+        padding-right: 0px !important;
+    }
+
+    html {
+        padding-top: 0px !important;
+        padding-right: 0px !important;
     }
 }
 
@@ -57,6 +50,7 @@ h5{
         font-size: 14px;
         color: #fff;
     }
+
     .bt_letslog {
         height: 68px;
         line-height: 68px;
@@ -83,19 +77,21 @@ h5{
 
 @media (min-width: 576px) {
     .bt_header_sm {
-        font-size: 2.15rem;
-        line-height: 2rem;
+        font-size: 3rem;
+        line-height: 3rem;
         color: #FFF;
         font-family: museo7, Helvetica, sans-serif;
         transition: .5s;
     }
+
     .bt_header_sm_2 {
-        font-size: 2.10rem;
-        line-height: 2rem;
+        font-size: 2.8rem;
+        line-height: 2.8rem;
         color: #FFF;
         font-family: museo7, Helvetica, sans-serif;
         transition: .5s;
     }
+
     .bt_header_sm_3 {
         font-size: 2rem;
         line-height: 2rem;
@@ -116,7 +112,7 @@ h5{
     .bt_title_num {
         /*//padding-top: 10px;*/
         font-size: 2rem;
-        line-height: 2rem;;
+        line-height: 2rem;
         vertical-align: middle;
         height: 100%;
         color: #fff;
@@ -135,6 +131,7 @@ h5{
         color: #fff;
         transition: .5s;
     }
+
     .bt_letslog_sm {
         height: 102px;
         line-height: 102px;
@@ -145,9 +142,8 @@ h5{
         padding: 10px 20px;
         border-radius: 2px;
         color: #fff;
-        font-size: 2.15rem;
-        line-height: 2rem;
-        line-height: normal;
+        font-size: 3rem;
+        line-height: 3rem;
         background-color: #27aae1;
         border-bottom: 3px solid #1891c4;
         transition: .5s;
@@ -158,56 +154,205 @@ h5{
         padding: 10px 20px;
         border-radius: 2px;
         color: #fff;
-        font-size: 2.15rem;
-        line-height: 2rem;
-        line-height: normal;
+        font-size: 2.5rem;
+        line-height: 2.5rem;
         background-color: #27aae1;
         border-bottom: 3px solid #1891c4;
         transition: .5s;
         font-family: museo3
     }
-    .bt_margin1{
+
+    .bt_margin1 {
         margin-bottom: 10%;
     }
-    .bt_margin2{
-        margin-bottom: 5%;
+
+    .bt_margin2 {
+        margin-bottom: 5% !important;
     }
-    .bt_margin3{
+
+    .bt_margin_in {
+        margin-bottom: 2% !important;
+    }
+
+    .ui-autocomplete .bt_margin2 {
+        height: 5rem !important;
+    }
+
+    .bt_margin3 {
         margin-bottom: 1%;
         margin-top: 1%;
     }
-    .bt_back{
-        z-index: -1;
-        background: url(/public/images/home/img11.jpg) center;
+
+    .bt_margin4 {
+        margin-bottom: 1rem !important;
+        margin-top: 1rem !important;
     }
-    .bt_header1{
+
+    .bt_margin_left_right {
+        margin-left: 1%;
+        height: 6rem;
+    }
+
+    .bt_back {
+        z-index: -1;
+        background: url('/public/images/home/img11.jpg') center;
+    }
+
+    .bt_header1 {
         color: #fff;
         font-family: museo9;
         text-shadow: 1px 1px 1px #000;
     }
-    .bt_caption{
+
+    .bt_caption {
         background-color: rgba(0, 0, 0, .6);
         z-index: 10;
         color: #fff;
         font-family: museo3;
     }
-    .bt_what{
+
+    .bt_what {
         background-image: url(/public/images/frontend/search-logo.png);
 
         background-repeat: no-repeat;
-        margin:0;
-        padding:0;
+        margin: 0;
+        padding: 0;
         -webkit-background-size: auto; /* pour anciens Chrome et Safari */
         background-size: auto; /* version standardisée */
     }
 
+    .bt_input_large {
+        background-image: url(/public/images/frontend/search-logo.png) no-repeat;
+        font-size: 3rem;
+        line-height: 3;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        width: 1%;
+        margin-bottom: 0;
+        display: block;
+        width: 100%;
+        padding: .375rem .75rem;
+        color: #495057;
+        background-color: #fff;
+        background-image: none;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 9px !important;
+        transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    }
 
+    .bt_btn_h11 {
+    @extend . btn;
+        font-size: 1.6rem !important;
+        line-height: 12.7 !important;
+        background-color: #27aae1 !important;
+        border-color: #27aae1 !important;
+        font-family: museo3 !important;
+        border-radius: 9px !important;
+        width: 10rem !important;
+        padding-top: 2rem !important;
+
+    }
+
+    .bt_autocomplete {
+        color: #1b1e21 !important;
+        background-color: transparent !important;
+        font-size: 2rem !important;
+        line-height: 2 !important;
+        display: inline !important;
+    }
+
+    .bt_ss2 {
+        margin-left: 0rem !important;
+        font-size: 2rem !important;
+        /*display: inline !important;*/
+        /*display: block !important;*/
+    }
+
+    .bt_ss1 {
+        margin-left: 2.5rem !important;
+        font-size: 2rem !important;
+        /*display: inline !important;*/
+        /*display: block !important;*/
+    }
+
+    .metier .bt_autocomplete {
+        background-size: 4rem auto !important;
+        background-position: 0.5rem -16.5rem !important;
+        padding: 1rem 5rem !important;
+    }
+
+    .prestation .bt_autocomplete {
+        background-size: 4rem auto !important;
+        background-position: 0.5rem -21.5rem !important;
+        padding: 1rem 2.5rem !important;
+    }
+
+    .artisan .bt_autocomplete {
+        background-size: 4rem auto !important;
+        padding: 1rem 2.5rem !important;
+        background-position: 0.5rem -26.5rem !important;
+    }
+
+    hr {
+        display: block !important;
+        height: 3px ! important;
+        border: 0 !important;
+        border-top: 3px solid white !important;
+        margin: 1em 0 !important;
+        padding: 0 !important;
+    }
+
+    .inner-addon {
+        position: relative !important;
+    }
+
+    /* style icon */
+    .inner-addon .fa {
+        position: absolute !important;
+
+        pointer-events: none !important;
+        z-index: 3;
+        font-size: 4rem;
+    }
+
+    /* align icon */
+    .left-addon .fa {
+        left: 0px !important;
+    }
+
+    .left-addon .fa-search {
+        left: 0px !important;
+        padding: 2.6rem 0.5rem !important;
+    }
+    .left-addon .fa-map-marker {
+        left: 0px !important;
+        padding: 2.6rem 1rem !important;
+    }
+
+    .right-addon .fa {
+        right: 0px !important;
+    }
+
+    /* add padding  */
+    .left-addon input {
+        padding-left: 5rem !important;
+    }
+
+    .right-addon input {
+        padding-left: 5rem !important;
+    }
 }
 
 .bt_white {
     color: #fff;
 }
-
 
 .bt_phonewhite {
     background-position: 21px -19px;
