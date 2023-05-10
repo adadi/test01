@@ -36,7 +36,26 @@ public class BarcodeApp {
             System.out.println("Generated barcode image: " + outputPath);
         }
     }
+private static Mat captureFrameFromCamera() {
+        VideoCapture capture = new VideoCapture(0);
 
+        if (!capture.isOpened()) {
+            System.err.println("Error: Cannot open the camera.");
+            return null;
+        }
+
+        Mat frame = new Mat();
+        boolean result = capture.read(frame);
+
+        capture.release();
+
+        if (!result) {
+            System.err.println("Error: Cannot read a frame from the camera.");
+            return null;
+        }
+
+        return frame;
+    }
     private static Mat captureFrameFromCamera() {
         VideoCapture capture = new VideoCapture(0);
         Mat frame = new Mat();
