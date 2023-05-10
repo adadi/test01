@@ -92,4 +92,23 @@ public class BarcodeApp {
             System.err.println("Error generating barcode: " + e.getMessage());
         }
     }
+    private static void loadOpenCVNativeLibrary() {
+    String osName = System.getProperty("os.name");
+    String opencvNativeLibraryName = "opencv_java451";
+    String opencvNativeLibraryPath = "";
+
+    if (osName.startsWith("Windows")) {
+        opencvNativeLibraryPath = "C:\\Users\\adadi\\opencv-4.5.1-vc14_vc15\\opencv\\build\\java\\x64\\" + opencvNativeLibraryName + ".dll";
+    } else if (osName.startsWith("Linux")) {
+        opencvNativeLibraryPath = "/path/to/libopencv_java451.so";
+    } else if (osName.startsWith("Mac")) {
+        opencvNativeLibraryPath = "/path/to/libopencv_java451.dylib";
+    } else {
+        throw new UnsupportedOperationException("Unsupported operating system: " + osName);
+    }
+
+    System.load(opencvNativeLibraryPath);
+}
+
+    
 }
