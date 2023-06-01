@@ -1,19 +1,11 @@
-Feature: Testing CaseService
+Subject: Issue with Keycloak for Project AROMA - Request for log files
 
-  Scenario: Retrieving cases between two booking dates
-    Given I have the start booking date "2023-01-01"
-    And I have the end booking date "2023-02-01"
-    When I call the getCases method
-    Then I should receive a list of CaseExternalDto
+Hello ITS team,
 
-  Scenario: Retrieving cases by IDs
-    Given I have the following case IDs:
-      | 1 |
-      | 2 |
-      | 3 |
-    When I call the getCaseByIds method
-    Then I should receive a list of CaseExternalDto
+I am encountering an issue with Keycloak on the preproduction environment for the AROMA project. To help me troubleshoot, could you please send me the latest Keycloak log files from the servers uqvpaap00000049 (Clichy) and uqvpaap0000004a (Marcoussis)?
 
-  Scenario: Retrieving last update
-    When I call the getLastUpdate method
-    Then I should receive a LastUpdateDto
+The files should be located in the following directory: /data/PIC/Softs/keycloak/jboss-eap-7.1/standalone/log.
+
+Thank you in advance.
+
+Best regards,
