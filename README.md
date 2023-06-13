@@ -1,5 +1,5 @@
 Summary:
-“Access issue with srv_occ_dev account causing operational bottleneck.”
+“Access issue with srv_occ_dev account causing a block in our work.”
 
 Description:
-“We’re encountering an issue with the srv_occ_dev account. It was previously accessible and functioning correctly, but it has now become inaccessible. This problem is causing a significant bottleneck in our operations. We would greatly appreciate any assistance in resolving this as soon as possible.”
+“We are facing a problem with the srv_occ_dev account. This account was previously accessible and functioning properly, but has now become inaccessible. This issue is blocking our work progress. We urgently need assistance in resolving this matter.”
