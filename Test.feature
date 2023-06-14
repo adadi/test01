@@ -1,19 +1,14 @@
-Feature: Testing CaseService
+Subject: Urgency: Security Vulnerability Detected in Apache 2.4.49 - Upgrade Required
 
-  Scenario: Retrieving cases between two booking dates
-    Given I have the start booking date "2023-01-01"
-    And I have the end booking date "2023-02-01"
-    When I call the getCases method
-    Then I should receive a list of CaseExternalDto
+Hello,
 
-  Scenario: Retrieving cases by IDs
-    Given I have the following case IDs:
-      | 1 |
-      | 2 |
-      | 3 |
-    When I call the getCaseByIds method
-    Then I should receive a list of CaseExternalDto
+The ISAP-ITS-DSS-VMS team has detected a significant security vulnerability in the current version of Apache (2.4.49) that we are using on our development, production, and pre-production servers.
 
-  Scenario: Retrieving last update
-    When I call the getLastUpdate method
-    Then I should receive a LastUpdateDto
+For security reasons, we need to upgrade to the latest version of Apache as soon as possible. This is a high-priority task that must be resolved immediately to avoid any potential risk.
+
+I am not certain of the team that will be responsible for this upgrade. Could you please identify the appropriate individuals and alert them to this situation? I can create a support ticket regarding this issue if needed.
+
+Thank you in advance for your prompt cooperation on this matter.
+
+Best regards,
+[Your nam
