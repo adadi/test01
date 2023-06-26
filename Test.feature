@@ -1,6 +1,20 @@
+Subject: Urgent Error on Master Deploy Preprod Job for Oneclick Front Intranet - Necessary Apache Playbook Modifications
+
 Hello,
 
-Thank you for your update. I’ve validated Apache on the pre-production server and everything is working well. You may proceed with upgrading Apache on the production server using the same version (Apache 2.4.57 with OpenSSL 3.0.1).
+I am writing to report an urgent error on the master deploy preprod job for oneclick front intranet. Here are the details of the error:
 
-Best regards,
-Soufiane
+[Insert error details here]
+
+I have spoken with Antoine Polfliet, who has already updated Apache. He advised me to check our Apache deployment playbook. He suggests adding the following line in the httpd.conf file:
+
+LoadModule ssl_module module/mod.so
+
+Also, we need to update the Apache path to:
+
+/data/occpre/apache/apacheCore
+
+Please consider these modifications and apply them as soon as possible.
+
+Best Regards,
+[Your name]
