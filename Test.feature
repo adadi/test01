@@ -1,20 +1,20 @@
-Subject: Urgent Error on Master Deploy Preprod Job for Oneclick Front Intranet - Necessary Apache Playbook Modifications
-
-Hello,
-
-I am writing to report an urgent error on the master deploy preprod job for oneclick front intranet. Here are the details of the error:
-
-[Insert error details here]
-
-I have spoken with Antoine Polfliet, who has already updated Apache. He advised me to check our Apache deployment playbook. He suggests adding the following line in the httpd.conf file:
-
-LoadModule ssl_module module/mod.so
-
-Also, we need to update the Apache path to:
-
-/data/occpre/apache/apacheCore
-
-Please consider these modifications and apply them as soon as possible.
-
-Best Regards,
-[Your name]
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/myapp.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Archivez les logs tous les jours -->
+            <fileNamePattern>./logs/myapp.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- Gardez les logs pour 30 jours -->
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
