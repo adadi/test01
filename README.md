@@ -1,49 +1,41 @@
-[ARO] Access PREPROD – Add/Modify User Access for AROGEST
+[ARO] Access PREPROD – Update Access for AROGEST
 
 ASIWANTSOTHAT
 
 As an AROGEST user,
-I want to add, modify, and execute access for folders X1 and X2 in the PREPROD environment,
+I want to update, add, modify, execute, and upload files for folders X1 and X2 in the PREPROD environment,
 So that I can efficiently manage and process files related to these folders without manual intervention.
 
 ⸻
 
 Description
 
-Data access for AROGEST users in PREPROD must be updated to include permissions for folders X1 and X2.
-This includes adding user access, modifying existing permissions, and allowing execution of necessary processes.
+Access for AROGEST users in PREPROD must be updated to include add, modify, execute, and upload permissions for folders X1 and X2. This will allow users to handle files without manual interventions and ensure seamless operations.
 
-Additionally, we need to ensure that users can upload files to the specified paths without encountering permission errors.
-
-Required Actions:
-	•	Grant AROGEST users access to X1 and X2 folders in PREPROD.
-	•	Enable modification and execution rights for the specified access.
-	•	Automate the process to avoid manual adjustments.
-	•	Ensure that users can successfully upload files to designated paths.
+Request Actions:
+	•	Update user access to allow add, modify, execute, and upload actions for X1 and X2 in PREPROD.
+	•	Ensure that file uploads to designated paths work without permission errors.
+	•	Automate access management to reduce manual configurations.
+	•	Log and monitor all access changes to maintain security and compliance.
 
 ⸻
 
 Design
 
-The system should be configured to allow AROGEST users to:
-	•	Access X1 and X2 folders in PREPROD.
-	•	Modify and execute files within these folders.
-	•	Upload files without authorization issues.
+The system should be configured so that AROGEST users can:
+	•	Add, modify, execute, and upload files within X1 and X2 folders in PREPROD.
+	•	Access these folders without restrictions.
+	•	Ensure all operations are correctly logged and monitored.
 
 ⸻
 
 Acceptance Criteria / BDD
 
-Scenario 1: Access Verification
+Scenario: User Access & File Management
 	•	Given: User access is configured in PREPROD.
-	•	When: An AROGEST user attempts to access X1 and X2 folders.
-	•	Then: The user should be able to add, modify, and execute files in these folders.
-
-Scenario 2: File Upload Verification
-	•	Given: The user has access rights to X1 and X2 folders.
-	•	When: They attempt to upload the file XX.XX to the path XXX.
-	•	Then: The file should be successfully uploaded without any authorization errors.
+	•	When: An AROGEST user attempts to add, modify, execute, or upload files within X1 and X2.
+	•	Then: The user should be able to perform these actions without any restrictions.
 
 ⸻
 
-This document outlines the required updates and expectations for ensuring AROGEST users can efficiently access and manage files in the PREPROD environment. Let me know if you need any refinements!
+This document defines the necessary updates to ensure AROGEST users have full access to manage files in PREPROD efficiently. Let me know if you need any modifications!
