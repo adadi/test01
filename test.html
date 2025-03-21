@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARO Report Claims Dashboard</title>
+    <title>Upgrade Java & Spring Boot – Security & API Communication Update</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,116 +34,117 @@
             padding: 10px;
             border-left: 4px solid #003366;
             font-family: monospace;
+            white-space: pre-wrap;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #003366;
-            color: white;
+        ul {
+            padding-left: 20px;
         }
     </style>
 </head>
 <body>
 
     <div class="section">
-        <h1>Environment: Production</h1>
-        <h2>Site: FRA</h2>
+        <h1>[ARO] Upgrade Java & Spring Boot – Security & API Communication Update</h1>
     </div>
 
     <div class="section">
         <h2 class="highlight">ASIWANTSOTHAT</h2>
-        <p><strong>As an AROMA User,</strong></p>
-        <p>I want to fix the Report Claims Dashboard Gulf</p>
-        <p>So that I will no longer generate it manually</p>
+        <p><strong>As a developer,</strong></p>
+        <p>I want to upgrade the project from <strong>Spring Boot 2 to Spring Boot 3</strong> and from <strong>Java 11 to Java 21</strong>,</p>
+        <p>So that I can improve performance, security, and compatibility with modern libraries and frameworks.</p>
     </div>
 
     <div class="section">
         <h2 class="highlight">Description</h2>
-        <p>Data of Report Claims Dashboard Gulf’s CACIB London tab are <span class="important">not good</span>.</p>
-        <p>The issue is due to the <span class="important">ARO1-1221</span> where Books related to <strong>CDR 71072(3V) & 71078(4E)</strong> have been added in the report instead of <strong>3V & 4E</strong>.</p>
-        <p>We should fix that.</p>
-
-        <p>Additionally, we need to externalize the process report from a **Scheduling** to a **Batch** to be automated:</p>
+        <p>The project needs to be upgraded to <strong>Spring Boot 3</strong> and <strong>Java 21</strong>. During this upgrade, some breaking changes require modifications, including:</p>
         <ul>
-            <li>Launch the batch manually through <strong>CTRL M</strong>.</li>
-            <li>Launch the batch on a specific range of dates.</li>
-            <li>Launch the batch on a Monthly basis like the current Schedule.</li>
+            <li>Remove <strong>Keycloak</strong> library because it is not compatible with Spring Boot 3.</li>
+            <li>Update security configuration by replacing Keycloak with the <strong>Nabil security library</strong>.</li>
+            <li>Ensure API communication with the authentication server works properly using <strong>Nabil library</strong>.</li>
+            <li>Upgrade dependencies including <strong>Lombok</strong> and other required libraries.</li>
+            <li>Upgrade Spring Boot and Java versions for the <strong>Common-Market-Data</strong> project.</li>
+            <li>Integrate <strong>Swagger UI</strong> and test the application using Swagger after the upgrade.</li>
         </ul>
     </div>
 
     <div class="section">
-        <h2 class="highlight">Design</h2>
+        <h2 class="highlight">Request Actions</h2>
+        <ul>
+            <li>Upgrade <strong>Java from 11 to 21</strong> and ensure compatibility with all dependencies.</li>
+            <li>Upgrade <strong>Spring Boot from 2 to 3</strong>, resolving all breaking changes.</li>
+            <li>Remove <strong>Keycloak dependency</strong> and replace authentication logic with the <strong>Nabil security library</strong>.</li>
+            <li>Update API communication with the authentication server using the <strong>Nabil library</strong>.</li>
+            <li>Upgrade <strong>Lombok</strong> and other necessary dependencies to their latest compatible versions.</li>
+            <li>Upgrade <strong>Spring Boot and Java</strong> for the Common-Market-Data project.</li>
+            <li>Add <strong>Swagger UI</strong> to expose API documentation and ensure all endpoints work correctly.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2 class="highlight">Design & Implementation</h2>
+
+        <h3>1. Remove Keycloak & Update Security Configuration</h3>
+        <p>Delete Keycloak dependency from <code>pom.xml</code>:</p>
+        <div class="code">
+            &lt;dependency&gt;<br>
+            &nbsp;&nbsp;&lt;groupId&gt;org.keycloak&lt;/groupId&gt;<br>
+            &nbsp;&nbsp;&lt;artifactId&gt;keycloak-spring-boot-starter&lt;/artifactId&gt;<br>
+            &nbsp;&nbsp;&lt;version&gt;...&lt;/version&gt;<br>
+            &lt;/dependency&gt;
+        </div>
+
+        <p>Replace security configuration with the <strong>Nabil security library</strong>:</p>
+        <div class="code">
+            @Configuration<br>
+            @EnableWebSecurity<br>
+            public class SecurityConfig {<br>
+            &nbsp;&nbsp;@Bean<br>
+            &nbsp;&nbsp;public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;return http<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.authorizeHttpRequests(auth -> auth<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.requestMatchers("/api/public/**").permitAll()<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.anyRequest().authenticated()<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build();<br>
+            &nbsp;&nbsp;}<br>
+            }
+        </div>
+
+        <h3>2. Update API Communication with Auth Server</h3>
+        <p>Use the <strong>Nabil library</strong> to authenticate API calls:</p>
+        <div class="code">
+            @Component<br>
+            public class ApiAuthService {<br>
+            &nbsp;&nbsp;public String getAccessToken() {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;// Logic to retrieve and return token using Nabil library<br>
+            &nbsp;&nbsp;}<br>
+            }
+        </div>
+
+        <h3>3. Upgrade Dependencies (Lombok & Others)</h3>
+        <p>Update <code>pom.xml</code> with the latest Lombok version:</p>
+        <div class="code">
+            &lt;dependency&gt;<br>
+            &nbsp;&nbsp;&lt;groupId&gt;org.projectlombok&lt;/groupId&gt;<br>
+            &nbsp;&nbsp;&lt;artifactId&gt;lombok&lt;/artifactId&gt;<br>
+            &nbsp;&nbsp;&lt;version&gt;1.18.30&lt;/version&gt;<br>
+            &nbsp;&nbsp;&lt;scope&gt;provided&lt;/scope&gt;<br>
+            &lt;/dependency&gt;
+        </div>
     </div>
 
     <div class="section">
         <h2 class="highlight">Acceptance Criteria / BDD</h2>
-        
-        <h3>Scenario 1: Check results</h3>
-        <p><span class="important">Given</span> Production data are copied on Test environment.</p>
-        <p><span class="important">When</span> the Batch is launched to calculate all 2024 months.</p>
-        <p><span class="important">Then</span> results should be equal to:</p>
 
-        <table>
-            <tr>
-                <th></th>
-                <th>Jan-24</th>
-                <th>Feb-24</th>
-                <th>Mar-24</th>
-                <th>Apr-24</th>
-            </tr>
-            <tr>
-                <td>Cases opened</td>
-                <td>44</td>
-                <td>25</td>
-                <td>27</td>
-                <td>39</td>
-            </tr>
-            <tr>
-                <td>Cases closed</td>
-                <td>37</td>
-                <td>41</td>
-                <td>30</td>
-                <td>23</td>
-            </tr>
-            <tr>
-                <td>Outstanding cases</td>
-                <td>223</td>
-                <td>41</td>
-                <td>205</td>
-                <td>152</td>
-            </tr>
-            <tr>
-                <td>Outstanding cases beyond 3 months</td>
-                <td>146</td>
-                <td>139</td>
-                <td>139</td>
-                <td>221</td>
-            </tr>
-            <tr>
-                <td>% beyond 3 months / outstanding</td>
-                <td>65%</td>
-                <td>67%</td>
-                <td>68%</td>
-                <td>69%</td>
-            </tr>
-            <tr>
-                <td>Average age of stock (in days)</td>
-                <td>208</td>
-                <td>195</td>
-                <td>208</td>
-                <td>208</td>
-            </tr>
-        </table>
+        <h3>Scenario: Application Upgrade & API Testing</h3>
+        <ul>
+            <li><strong>Given:</strong> The application is upgraded to <strong>Spring Boot 3 and Java 21</strong>.</li>
+            <li><strong>When:</strong> A user opens <strong>Swagger UI</strong> (<code>https://your-api-url/swagger</code>).</li>
+            <li><strong>And:</strong> Clicks <strong>"Authorize"</strong>, enters the token (retrieved via cURL), and clicks <strong>"Authorize"</strong>.</li>
+            <li><strong>And:</strong> Selects an API endpoint, clicks <strong>"Try it out"</strong>, fills in parameters or request body if needed, and clicks <strong>"Execute"</strong>.</li>
+            <li><strong>Then:</strong> The API should return a <strong>valid response</strong> with expected data and status codes.</li>
+        </ul>
     </div>
 
 </body>
