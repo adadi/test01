@@ -1,146 +1,150 @@
-[ARO] Upgrade Java & Spring Boot – Security & API Communication Update
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARO Report Claims Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #003366;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .highlight {
+            color: green;
+            font-weight: bold;
+        }
+        .important {
+            color: red;
+            font-weight: bold;
+        }
+        .code {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-left: 4px solid #003366;
+            font-family: monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #003366;
+            color: white;
+        }
+    </style>
+</head>
+<body>
 
-ASIWANTSOTHAT
+    <div class="section">
+        <h1>Environment: Production</h1>
+        <h2>Site: FRA</h2>
+    </div>
 
-As a developer,
-I want to upgrade the project from Spring Boot 2 to Spring Boot 3 and from Java 11 to Java 21,
-So that I can improve performance, security, and compatibility with modern libraries and frameworks.
+    <div class="section">
+        <h2 class="highlight">ASIWANTSOTHAT</h2>
+        <p><strong>As an AROMA User,</strong></p>
+        <p>I want to fix the Report Claims Dashboard Gulf</p>
+        <p>So that I will no longer generate it manually</p>
+    </div>
 
-⸻
+    <div class="section">
+        <h2 class="highlight">Description</h2>
+        <p>Data of Report Claims Dashboard Gulf’s CACIB London tab are <span class="important">not good</span>.</p>
+        <p>The issue is due to the <span class="important">ARO1-1221</span> where Books related to <strong>CDR 71072(3V) & 71078(4E)</strong> have been added in the report instead of <strong>3V & 4E</strong>.</p>
+        <p>We should fix that.</p>
 
-Description
+        <p>Additionally, we need to externalize the process report from a **Scheduling** to a **Batch** to be automated:</p>
+        <ul>
+            <li>Launch the batch manually through <strong>CTRL M</strong>.</li>
+            <li>Launch the batch on a specific range of dates.</li>
+            <li>Launch the batch on a Monthly basis like the current Schedule.</li>
+        </ul>
+    </div>
 
-The project needs to be upgraded to Spring Boot 3 and Java 21. During this upgrade, some breaking changes require modifications, including:
-	1.	Remove Keycloak library because it is not compatible with Spring Boot 3.
-	2.	Update security configuration by replacing Keycloak with the Nabil security library.
-	3.	Ensure API communication with the authentication server works properly using Nabil library.
-	4.	Upgrade dependencies including Lombok and other required libraries.
-	5.	Upgrade Spring Boot and Java versions for the Common-Market-Data project.
-	6.	Integrate Swagger UI and test the application using Swagger after the upgrade.
+    <div class="section">
+        <h2 class="highlight">Design</h2>
+    </div>
 
-⸻
+    <div class="section">
+        <h2 class="highlight">Acceptance Criteria / BDD</h2>
+        
+        <h3>Scenario 1: Check results</h3>
+        <p><span class="important">Given</span> Production data are copied on Test environment.</p>
+        <p><span class="important">When</span> the Batch is launched to calculate all 2024 months.</p>
+        <p><span class="important">Then</span> results should be equal to:</p>
 
-Request Actions
-	•	Upgrade Java from 11 to 21 and ensure compatibility with all dependencies.
-	•	Upgrade Spring Boot from 2 to 3, resolving all breaking changes.
-	•	Remove Keycloak dependency and replace authentication logic with Nabil security library.
-	•	Update API communication with the authentication server using the Nabil library.
-	•	Upgrade Lombok and other necessary dependencies to their latest compatible versions.
-	•	Upgrade Spring Boot and Java for the Common-Market-Data project.
-	•	Add Swagger UI to expose API documentation and ensure all endpoints work correctly.
+        <table>
+            <tr>
+                <th></th>
+                <th>Jan-24</th>
+                <th>Feb-24</th>
+                <th>Mar-24</th>
+                <th>Apr-24</th>
+            </tr>
+            <tr>
+                <td>Cases opened</td>
+                <td>44</td>
+                <td>25</td>
+                <td>27</td>
+                <td>39</td>
+            </tr>
+            <tr>
+                <td>Cases closed</td>
+                <td>37</td>
+                <td>41</td>
+                <td>30</td>
+                <td>23</td>
+            </tr>
+            <tr>
+                <td>Outstanding cases</td>
+                <td>223</td>
+                <td>41</td>
+                <td>205</td>
+                <td>152</td>
+            </tr>
+            <tr>
+                <td>Outstanding cases beyond 3 months</td>
+                <td>146</td>
+                <td>139</td>
+                <td>139</td>
+                <td>221</td>
+            </tr>
+            <tr>
+                <td>% beyond 3 months / outstanding</td>
+                <td>65%</td>
+                <td>67%</td>
+                <td>68%</td>
+                <td>69%</td>
+            </tr>
+            <tr>
+                <td>Average age of stock (in days)</td>
+                <td>208</td>
+                <td>195</td>
+                <td>208</td>
+                <td>208</td>
+            </tr>
+        </table>
+    </div>
 
-⸻
-
-Design & Implementation
-
-1. Remove Keycloak & Update Security Configuration
-	•	Delete Keycloak dependency from pom.xml:
-
-<dependency>
-    <groupId>org.keycloak</groupId>
-    <artifactId>keycloak-spring-boot-starter</artifactId>
-    <version>...</version>
-</dependency>
-
-
-	•	Replace security configuration with the Nabil security library:
-
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/public/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                .build();
-    }
-}
-
-
-
-2. Update API Communication with Auth Server
-	•	Use the Nabil library to authenticate API calls:
-
-@Component
-public class ApiAuthService {
-    public String getAccessToken() {
-        // Logic to retrieve and return token using Nabil library
-    }
-}
-
-
-
-3. Upgrade Dependencies (Lombok & Others)
-	•	Update pom.xml with the latest Lombok version:
-
-<dependency>
-    <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId>
-    <version>1.18.30</version>
-    <scope>provided</scope>
-</dependency>
-
-
-	•	Upgrade Spring Boot version:
-
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.0</version>
-    <relativePath/>
-</parent>
-
-
-
-4. Upgrade Spring & Java for Common-Market-Data Project
-	•	Update Java version in pom.xml:
-
-<properties>
-    <java.version>21</java.version>
-</properties>
-
-
-	•	Ensure all dependencies in the Common-Market-Data project are compatible with Java 21 and Spring Boot 3.
-
-5. Add Swagger for API Documentation
-	•	Add Swagger dependencies:
-
-<dependency>
-    <groupId>org.springdoc</groupId>
-    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version>2.1.0</version>
-</dependency>
-
-
-	•	Enable Swagger in the application:
-
-@OpenAPIDefinition(info = @Info(title = "API Documentation", version = "1.0"))
-@RestController
-@RequestMapping("/api")
-public class ApiController {
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("API is working!");
-    }
-}
-
-
-
-⸻
-
-Acceptance Criteria / BDD
-
-Scenario: Application Upgrade & API Testing
-	•	Given: The application is upgraded to Spring Boot 3 and Java 21.
-	•	When: A user opens Swagger UI (https://your-api-url/swagger).
-	•	And: Clicks “Authorize”, enters the token (retrieved via cURL), and clicks “Authorize”.
-	•	And: Selects an API endpoint, clicks “Try it out”, fills in parameters or request body if needed, and clicks “Execute”.
-	•	Then: The API should return a valid response with expected data and status codes.
-
-⸻
-
-This document outlines the necessary upgrades and testing procedures after migrating to Spring Boot 3 and Java 21 while ensuring secure authentication and API communication. Let me know if you need any modifications!
+</body>
+</html>
