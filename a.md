@@ -1,22 +1,14 @@
-Sa réponse est globalement solide, mais il y a **une erreur à ne pas valider** et deux détails à corriger.
+**Le plan tient la route**, mais je vois trois points à corriger avant de donner le GO.
 
-**1. Le motif « `2A 00` / `00 2A` seuls » est faux et dangereux**
-Un en-tête TIFF commence **toujours** par l'ordre des octets (`II` ou `MM`). Un « HEIC conforme sans II/MM » n'existe pas. Ce qui est vrai, c'est que dans un HEIC conforme le préfixe `Exif\0\0` est optionnel : le TIFF peut commencer directement par `II 2A 00` ou `MM 00 2A`. Sur ce point, sa remarque sur le faux négatif est juste, et je la retiens.
+**1. irot/imir : risque de double rotation (le plus important).** En HEIF, la rotation normative est portée par les propriétés `irot`/`imir` (dans `ipma`). L'orientation EXIF n'est qu'informative. Les iPhone écrivent souvent les deux. Si votre décodeur (ffmpeg, libheif…) applique déjà `irot`, et que vous appliquez ensuite l'EXIF, l'image tourne deux fois. ffmpeg récent expose `irot` en display matrix, et le CLI fait l'autorotate par défaut. Je vous conseille d'ajouter un test rouge sur les vrais fichiers : vérifier les dimensions et pixels après décodage, avant toute rotation maison. Ensuite, décidez d'une seule source de vérité : `irot`/`imir` en priorité, l'EXIF seulement en fallback.
 
-Chercher un motif de 2 octets seulement provoquerait environ 150 correspondances aléatoires dans un fichier de 10 Mo. Ce serait exactement le faux positif qu'on veut éliminer.
+**2. Offset du TIFF.** Le TIFF commence à `payload[4 + exif_tiff_header_offset]`, pas à `payload[offset]`. La formulation « `payload[0:4]` = offset → TIFF direct » est ambiguë. Il faut un test avec offset=0 (Samsung sans préfixe) et un autre avec offset=6.
 
-👉 Il faut garder les candidats `Exif\0\0`+TIFF **ou** TIFF complet (`II 2A 00` / `MM 00 2A`), et **retirer** le motif à 2 octets.
+**3. Orientations 2/4/5/7 → 0.** Ces orientations ne sont pas « rien ». 5 et 7 combinent une rotation de 90°/270° avec un miroir. Les mapper à 0 donne une image couchée. Gérez-les, ou au minimum faites un mapping 5→90 et 7→270 en documentant que le miroir est ignoré.
 
-**2. Le `00 00 00 06` n'est pas une « longueur »**
-D'après la spec HEIF, ces 4 octets sont l'`exif_tiff_header_offset` : le nombre d'octets à sauter pour arriver au TIFF (ici les 6 octets de `Exif\0\0`). C'est la méthode propre. On trouve l'item Exif via `iloc`, on lit cet offset, et on tombe directement sur le TIFF, sans aucun scan. C'est plus robuste que n'importe quelle liste de motifs, et c'est ce que font les bibliothèques comme `metadata-extractor`.
+**Pièges de parsing à couvrir par des tests :**
+- **`iloc` :** versions 0/1/2, `offset_size`/`length_size`/`base_offset_size` variables (0/4/8), `construction_method` 1 (données dans `idat`), extents multiples, `item_ID` sur 32 bits en v2.
+- **`iinf`/`infe` :** `entry_count` sur 16 ou 32 bits selon la version, `infe` v2 vs v3.
+- **Tag 0x0112 :** un SHORT occupe les 2 premiers octets du champ valeur, dans l'endianness du TIFF. Il ne faut pas le lire comme un uint32.
 
-**3. Le numéro de ticket ne correspond pas**
-Il propose de déposer les fichiers dans `tickets\DSI-52473\`, alors que ton onglet affiche **DSI-51784**. Vérifie avant de créer le dossier.
-
-**Sur iPhone : BE ou LE ?**
-Nos souvenirs divergent. Je reste sur l'idée qu'Apple écrit en `MM` (big-endian), et la structure de tes fixtures, avec offset 6 et `Exif\0\0` suivi de `MM`, ressemble justement au format Apple. Mais seuls les deux vrais fichiers trancheront, et comme il le dit, le correctif est le même dans les deux cas.
-
-**Ce que je lui répondrais :**
-- (a) Validé : correctif multi-motifs et arrêt au premier en-tête valide, **sans** le motif `2A 00`/`00 2A` seul. Idéalement, lire l'offset de l'item Exif plutôt que scanner.
-- (b) Les deux fichiers dans le dossier du bon ticket (à vérifier).
-- Tests rouges : TIFF little-endian valide, TIFF sans préfixe `Exif\0\0`, orientation 1 avec faux en-tête plus loin dans le payload.
+Le reste est cohérent : le retrait du motif 2 octets, le fallback limité aux en-têtes complets, l'arrêt au premier hit valide, la correction du fixture `II 00 2A` et l'approche tests rouges d'abord. Vous pouvez valider en demandant d'intégrer ces trois points dans `PLAN.md`.
