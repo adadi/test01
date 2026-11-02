@@ -1,21 +1,18 @@
-Le verdict de l'autre assistant est sérieux, et il a raison de me corriger sur le **point 7** : il y a bien un `log.warn` avec l'exception complète, et un `catch (Exception)` laisse remonter un `OutOfMemoryError`. Je retire donc ce point, sauf sur un aspect : l'appelant reçoit le même `Optional.empty()` quelle que soit la cause.
+Je concède les deux points :
+- **Probabilité** : son calcul en chaîne est juste. Un faux positif doit franchir cinq contrôles successifs, donc le risque est théorique. « Rare » était exagéré.
+- **Le vrai bug** : `isTiffHeader` exige `00 2A` pour les deux ordres d'octets, donc un vrai TIFF little-endian (`II 2A 00`) n'est jamais reconnu. Et les fixtures valident le bug au lieu de le détecter. C'est une très bonne trouvaille.
 
-En regardant le code maintenant visible, je vois **trois choses qu'il n'a pas relevées** :
+**Une nuance importante sur l'impact réel**
+Il affirme que les EXIF iPhone sont « presque toujours little-endian ». De mémoire, c'est plutôt l'inverse : **Apple écrit ses EXIF en big-endian (`MM`)**, y compris dans les HEIC. Ce sont surtout les HEIC Android (Samsung, Xiaomi…) qui sont en little-endian (`II`). Si c'est le cas :
+- les photos iPhone sont probablement bien tournées aujourd'hui, ce qui expliquerait que personne n'ait rien remarqué ;
+- les photos Android en portrait sortent de travers.
 
-**1. `parseExifRotation` peut produire une rotation aléatoire (bug probable)**
-La boucle parcourt **tout le fichier**, octet par octet, à la recherche d'un en-tête TIFF (`II*\0` / `MM\0*`). Elle ne s'arrête que si l'orientation vaut 3, 6 ou 8. Pour une photo déjà droite (orientation 1), elle **continue donc à scanner** les données HEVC compressées. Ces données sont pseudo-aléatoires : tôt ou tard, 4 octets ressemblent à un en-tête TIFF, et si les octets suivants donnent « 6 », l'image est tournée à tort. C'est rare, mais non déterministe et très difficile à diagnostiquer.
+Ça ne change pas la priorité, mais ça change le diagnostic et le test. **Vérifie sur deux vrais fichiers**, un iPhone et un Samsung, en cherchant `Exif\0\0` dans un hexdump : les deux octets suivants indiquent `MM` ou `II`. Ça tranche en une minute.
 
-- **Correctif minimal** : s'arrêter au premier en-tête TIFF valide, quelle que soit l'orientation (renvoyer 0 si elle vaut 1).
-- **Correctif propre** : localiser l'item Exif via la structure HEIF, ou utiliser une bibliothèque comme `metadata-extractor`, qui gère le HEIC.
+**Petite amélioration de son correctif minimal**
+Au lieu de chercher un en-tête TIFF nu n'importe où, il faut chercher la séquence **`Exif\0\0` suivie de l'en-tête TIFF**. C'est ainsi que l'item Exif est stocké dans le HEIC. Ça élimine pratiquement les faux positifs sans ajouter de bibliothèque.
 
-**2. Le `finally` peut faire échouer une conversion réussie**
-Si `Files.deleteIfExists` lève une `IOException` (fichier encore verrouillé, ce qui arrive sous Windows), cette exception **remplace le `return Optional.of(...)`**. Le `catch (Exception)` renvoie alors `empty()` alors que le JPEG était prêt. De plus, si la première suppression échoue, le dossier parent n'est jamais supprimé. Il faut entourer chaque suppression d'un try/catch qui se contente de logger.
+**Sur son plan**
+Je le validerais tel quel. Il a raison de passer le bug little-endian en n°1. Sa remarque sur le test du `finally` est juste aussi : extraire la suppression dans une méthode qu'on peut simuler est plus propre qu'un test dépendant de Windows.
 
-**3. Une rotation par `AffineTransform` bicubique est inutile pour des multiples de 90°**
-C'est un ré-échantillonnage complet : coûteux sur 12–50 Mpx, et il peut laisser des artefacts en bordure. Une copie pixel à pixel (transposition et inversion) est exacte et bien plus rapide. C'est un point mineur.
-
-**Sur la suite proposée** : son plan (PLAN.md puis TDD) est bon. Je mettrais le **bug du scan EXIF au même niveau que le plafond de taille**, car les deux se corrigent vite et se testent facilement :
-- pour le scan, un test avec une photo en orientation 1 dont les données contiennent un faux en-tête ;
-- pour le `finally`, un test qui simule l'échec de suppression.
-
-La réécriture en décodeur unique peut attendre la mesure de performance.
+Ajoute simplement aux fixtures de test un vrai HEIC Android en portrait, à côté de l'iPhone : c'est le cas qui casse en production.
