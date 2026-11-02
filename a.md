@@ -1,37 +1,21 @@
-Oui, ton approche en 2 phases est la bonne, et le surcoût de 472 ms vient surtout de la phase 1 (sous-requête + `countDistinct`), pas du principe.
+Le verdict de l'autre assistant est sérieux, et il a raison de me corriger sur le **point 7** : il y a bien un `log.warn` avec l'exception complète, et un `catch (Exception)` laisse remonter un `OutOfMemoryError`. Je retire donc ce point, sauf sur un aspect : l'appelant reçoit le même `Optional.empty()` quelle que soit la cause.
 
-**1. Correcte et idiomatique ?**
-Oui : pager sur les ids, puis charger les enfants par lots `in :ids`, c'est le pattern standard. Deux réserves :
-- La variante idiomatique recharge les entités (`select d from Document d where d.id in :ids`, puis un `left join fetch` par collection, une collection par requête, donc pas de `MultipleBagFetchException`). Cela évite le mapping `Object[]` à la main, qui est fragile.
-- Tu as raté `@BatchSize` / `hibernate.default_batch_fetch_size`. Il fait passer le N+1 EAGER de ~350 requêtes à ~7 sans toucher au code de requête.
+En regardant le code maintenant visible, je vois **trois choses qu'il n'a pas relevées** :
 
-**2. Pourquoi plus lent que l'existant ?**
-Oui, c'est attendu avec cette forme. `id in (select id … where spec)` devient un semi-join sur 750k lignes. Le planner ne peut alors plus utiliser l'index `created_at` avec arrêt anticipé au `LIMIT 50`. Il fait souvent un hash + tri complet. Vérifie avec `EXPLAIN (ANALYZE, BUFFERS)`.
+**1. `parseExifRotation` peut produire une rotation aléatoire (bug probable)**
+La boucle parcourt **tout le fichier**, octet par octet, à la recherche d'un en-tête TIFF (`II*\0` / `MM\0*`). Elle ne s'arrête que si l'orientation vaut 3, 6 ou 8. Pour une photo déjà droite (orientation 1), elle **continue donc à scanner** les données HEVC compressées. Ces données sont pseudo-aléatoires : tôt ou tard, 4 octets ressemblent à un en-tête TIFF, et si les octets suivants donnent « 6 », l'image est tournée à tort. C'est rare, mais non déterministe et très difficile à diagnostiquer.
 
-Correctif : construis le prédicat sur le `root`, puis teste `root.getJoins().isEmpty()`.
-- Pas de join enfant : pas de doublons possibles, donc tu appliques la spec directement (sans sous-requête ni distinct).
-- Joins présents : sous-requête, ou `EXISTS` plutôt que `IN`.
+- **Correctif minimal** : s'arrêter au premier en-tête TIFF valide, quelle que soit l'orientation (renvoyer 0 si elle vaut 1).
+- **Correctif propre** : localiser l'item Exif via la structure HEIF, ou utiliser une bibliothèque comme `metadata-extractor`, qui gère le HEIC.
 
-Ajoute aussi `id` comme tie-breaker dans le tri, sinon la pagination n'est pas déterministe. Un index `(created_at desc, id)` aide.
+**2. Le `finally` peut faire échouer une conversion réussie**
+Si `Files.deleteIfExists` lève une `IOException` (fichier encore verrouillé, ce qui arrive sous Windows), cette exception **remplace le `return Optional.of(...)`**. Le `catch (Exception)` renvoie alors `empty()` alors que le JPEG était prêt. De plus, si la première suppression échoue, le dossier parent n'est jamais supprimé. Il faut entourer chaque suppression d'un try/catch qui se contente de logger.
 
-**3. `countDistinct` à chaque appel ?**
-Non, c'est probablement le plus gros coût : `count(distinct)` sur 750k est bien plus lent qu'un `count(*)`. Options :
-- `count(*)` quand il n'y a pas de join (cas majoritaire).
-- Count optionnel ou `Slice` (fetch de size+1) si le contrat d'API le permet.
-- Cache du count par hash de spec avec un TTL court.
-- Estimation via les stats Postgres pour les requêtes sans filtre.
+**3. Une rotation par `AffineTransform` bicubique est inutile pour des multiples de 90°**
+C'est un ré-échantillonnage complet : coûteux sur 12–50 Mpx, et il peut laisser des artefacts en bordure. Une copie pixel à pixel (transposition et inversion) est exacte et bien plus rapide. C'est un point mineur.
 
-**4. Alternatives**
-- `@BatchSize` (ou le paramètre global) : meilleur rapport coût/bénéfice, et probablement suffisant.
-- `@Fetch(SUBSELECT)` : à éviter avec la pagination.
-- `@Fetch(JOIN)` : ne contourne pas l'interdit des multiples bags.
-- Pagination keyset au lieu d'offset si les pages profondes comptent.
-- Remise en cause du join-fetch : ton endpoint existant est déjà à 176 ms. Ton benchmark est probablement en local, où un aller-retour coûte ~0 ms. En prod, avec 1–2 ms de latence réseau, ~350 requêtes sont nettement plus coûteuses. Compare donc le nombre de requêtes et teste sous concurrence avant de conclure.
+**Sur la suite proposée** : son plan (PLAN.md puis TDD) est bon. Je mettrais le **bug du scan EXIF au même niveau que le plafond de taille**, car les deux se corrigent vite et se testent facilement :
+- pour le scan, un test avec une photo en orientation 1 dont les données contiennent un faux en-tête ;
+- pour le `finally`, un test qui simule l'échec de suppression.
 
-**5. Architecture recommandée avec RSQL dynamique**
-1. Phase 1 : ids paginés, spec directe si aucun join, sinon `EXISTS`, avec tri stable (`created_at desc, id`).
-2. Count séparé, `count(*)` ou en cache, et optionnel si possible.
-3. Phase 2 : chargement par lots via `@BatchSize` ou un fetch-join par collection.
-4. Garde-fous : liste blanche des champs filtrables/indexés, `statement_timeout`, taille de page maximale.
-
-Si tu veux, je peux te réécrire `findPageIds` et `countDocuments` avec la détection `root.getJoins()`.
+La réécriture en décodeur unique peut attendre la mesure de performance.
