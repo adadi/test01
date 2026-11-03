@@ -1,14 +1,27 @@
-**Le plan tient la route**, mais je vois trois points à corriger avant de donner le GO.
+Le plan est solide, mais j'y vois une erreur de mapping et un risque sérieux sur la source de rotation. Les deux sont à corriger avant le GO.
 
-**1. irot/imir : risque de double rotation (le plus important).** En HEIF, la rotation normative est portée par les propriétés `irot`/`imir` (dans `ipma`). L'orientation EXIF n'est qu'informative. Les iPhone écrivent souvent les deux. Si votre décodeur (ffmpeg, libheif…) applique déjà `irot`, et que vous appliquez ensuite l'EXIF, l'image tourne deux fois. ffmpeg récent expose `irot` en display matrix, et le CLI fait l'autorotate par défaut. Je vous conseille d'ajouter un test rouge sur les vrais fichiers : vérifier les dimensions et pixels après décodage, avant toute rotation maison. Ensuite, décidez d'une seule source de vérité : `irot`/`imir` en priorité, l'EXIF seulement en fallback.
+**1. Orientation 4 → 180, pas 0 (bug du tableau)**
+Pour ignorer le miroir, la règle cohérente est de garder la rotation R telle que `affichage = flipH ∘ R(stocké)`. L'image reste alors à l'endroit, juste inversée gauche-droite.
+- 2 = flipH → **0** ✓
+- 4 = flipV = flipH ∘ rot180 → **180** (avec 0, l'image sort à l'envers)
+- 5 = transpose = flipH ∘ rot90 → **90** ✓
+- 7 = transverse = flipH ∘ rot270 → **270** ✓
 
-**2. Offset du TIFF.** Le TIFF commence à `payload[4 + exif_tiff_header_offset]`, pas à `payload[offset]`. La formulation « `payload[0:4]` = offset → TIFF direct » est ambiguë. Il faut un test avec offset=0 (Samsung sans préfixe) et un autre avec offset=6.
+La note « 2/4 = flip pur sans rotation » est donc fausse pour 4. Il faut corriger le tableau et la tâche 8 en ajoutant un test 4 → 180.
 
-**3. Orientations 2/4/5/7 → 0.** Ces orientations ne sont pas « rien ». 5 et 7 combinent une rotation de 90°/270° avec un miroir. Les mapper à 0 donne une image couchée. Gérez-les, ou au minimum faites un mapping 5→90 et 7→270 en documentant que le miroir est ignoré.
+**2. `displayRotation == 0` comme sentinelle est ambigu**
+Avec cette condition, on ne distingue pas « pas d'irot » de « irot = 0, pixels déjà droits ». Or un HEIC réexporté par un éditeur a souvent des pixels déjà tournés avec un EXIF resté à 6. Le fallback EXIF provoquerait alors exactement la double rotation qu'on veut éviter. C'est aussi pour ça que la tâche 6 n'est pas testable telle quelle.
+→ Il faut tester la **présence** de la side data `DISPLAYMATRIX`, pas sa valeur. Le fallback EXIF ne s'applique que si elle est absente.
 
-**Pièges de parsing à couvrir par des tests :**
-- **`iloc` :** versions 0/1/2, `offset_size`/`length_size`/`base_offset_size` variables (0/4/8), `construction_method` 1 (données dans `idat`), extents multiples, `item_ID` sur 32 bits en v2.
-- **`iinf`/`infe` :** `entry_count` sur 16 ou 32 bits selon la version, `infe` v2 vs v3.
-- **Tag 0x0112 :** un SHORT occupe les 2 premiers octets du champ valeur, dans l'endianness du TIFF. Il ne faut pas le lire comme un uint32.
+**3. Grilles de tuiles iPhone : la rotation n'est peut-être pas sur le stream lu**
+Les HEIC iPhone sont des grilles. Dans FFmpeg 7.1+, il me semble que la display matrix d'une grille est exportée sur le **stream group** (`AVStreamGroupTileGrid.coded_side_data`), pas sur les streams de tuiles. Or `getDisplayRotation()` lit le stream vidéo du grabber. Sur un vrai iPhone, ça peut donc renvoyer 0 en permanence, et vous retombez silencieusement sur l'EXIF. C'est à vérifier dans les sources JavaCV. Le test de contrat (tâche 3) le révélera, ce qui le rend vraiment bloquant.
 
-Le reste est cohérent : le retrait du motif 2 octets, le fallback limité aux en-têtes complets, l'arrêt au premier hit valide, la correction du fixture `II 00 2A` et l'approche tests rouges d'abord. Vous pouvez valider en demandant d'intégrer ces trois points dans `PLAN.md`.
+**4. Convention de signe et normalisation**
+`av_display_rotation_get` renvoie un angle **anti-horaire** dans [-180, 180]. Un portrait iPhone ressort typiquement à -90. Il faut normaliser vers {0, 90, 180, 270} et rejeter ou logger les valeurs non multiples de 90. Avec un `imir`, la valeur extraite de la matrice peut aussi être faussée : il faut vérifier le déterminant.
+
+**Points secondaires**
+- **Plafond 50 Mo** : faire une lecture bornée (lire au plus 50 Mo + 1 octet). Lire tout le flux puis vérifier la taille annule l'intérêt du plafond.
+- **« Sans ICC »** : les photos iPhone sont en Display P3. Sans profil ICC, les couleurs sortent ternes. C'est hors périmètre v1, mais ça mérite un ticket.
+- **EXIF dans le JPEG** : si un jour l'EXIF est recopié, il faut forcer Orientation = 1, sinon les viewers tourneront l'image une seconde fois.
+
+Le reste (validation TIFF, `payload[4+offset]`, pièges `iloc`/`iinf`, cleanup non-échouable, ordre rouge puis vert) me paraît juste.
