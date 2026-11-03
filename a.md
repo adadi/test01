@@ -1,23 +1,18 @@
-Bon travail, la phase rouge est propre. **GO pour la phase verte**, avec trois points à régler d'abord, dont un manque dans les rouges.
+Non. **Le fichier temporaire n'est pas obligatoire.** L'autre assistant l'a vérifié dans les sources de JavaCV 1.5.14 :
+- `new FFmpegFrameGrabber(InputStream)` gère le seek via `mark/reset`, ce dont le conteneur HEIF a besoin ;
+- un `ByteArrayInputStream` **ne copie pas** le tableau : tous les grabbers peuvent partager le même `byte[] heicBytes`, sans dupliquer le fichier en mémoire.
 
-**1. Il manque les rouges des tâches 11 et 12**
-Les 5 fichiers couvrent la matrice, l'EXIF, le resolver et la side data, mais aucun test ne couvre :
-- le **plafond de 50 Mio** : un flux de 50 Mio + 1 octet doit donner `empty()`, et il faut vérifier que la lecture s'arrête vraiment là (par exemple avec un `InputStream` qui compte les octets lus) ;
-- le **cleanup qui ne doit pas faire échouer la conversion** : un échec de suppression ne doit pas perdre le JPEG. Passe par la méthode qu'on peut simuler, comme prévu.
+**Ce qu'il faudrait changer**
+- Remplacer `Path heicTempFile` par `byte[] heicBytes` dans `decodePrimaryImage`, `stitchTileGrid`, `decodeTilesInParallel` et `decodeVideoStream`.
+- Écrire `new FFmpegFrameGrabber(new ByteArrayInputStream(heicBytes))` avec **un stream neuf par grabber**. Un stream partagé entre threads casserait les seeks.
+- Supprimer `createPrivateTempFile`, `Files.write`, le `finally` avec `deleteQuietly` et le `@SuppressWarnings("java:S5443")`.
 
-Il faut les écrire **avant** le vert, sinon ces deux correctifs partent sans filet.
+**Ce qu'on y gagne**
+- Plus d'écriture disque, plus de nettoyage, plus de permissions 700.
+- Le problème du fichier verrouillé sous Windows disparaît.
+- Ça marche aussi sur un filesystem en lecture seule.
 
-**2. L'oracle des matrices avec miroir ne doit pas venir de votre propre code**
-Si les 8 matrices canoniques et leurs rotations attendues sont écrites à la main avec la même règle `R = flipH·M` que l'implémentation, le test croisé confirme la règle par elle-même. Construisez plutôt les matrices de test avec les fonctions de FFmpeg, `av_display_rotation_set` puis `av_display_matrix_flip`, disponibles dans bytedeco avutil. L'oracle devient alors indépendant, y compris pour les miroirs.
+**Ce qu'on y perd**
+Presque rien en mémoire, puisque les octets sont déjà dans `heicBytes`. Les lectures passent par un callback Java au lieu du cache disque de l'OS, ce qui est négligeable à cette taille.
 
-**3. Petite remarque sur le rouge**
-« Compilation failure » est un rouge valide, mais il est faible. Au début du vert, créez d'abord les classes vides et vérifiez que les tests échouent **sur leurs assertions**, en particulier le cas TIFF little-endian `II 2A 00`. C'est ce test-là qui doit prouver le bug.
-
-**Ta question : oui, ajoute les 2 vrais HEIC comme fixtures**, avec trois précautions :
-- **Les dimensions ne suffisent pas** : 3024x4032 sort aussi bien avec une rotation de 90° que de 270°. Ajoute une assertion d'orientation. Le plus simple est la couleur moyenne d'un coin ou d'un quart de l'image, comparée à une référence produite par un décodeur indépendant (aperçu Windows ou libheif), avec une tolérance.
-- **Données personnelles du fichier iPhone** : si c'est une vraie photo (la tienne ou celle d'un collègue), vérifie les coordonnées GPS et les infos de l'appareil avant de la committer. `exiftool -gps:all=` les retire d'un HEIC sans ré-encoder l'image. Le Samsung vient d'un site d'échantillons libres, il n'y a pas ce souci.
-- **Taille** : environ 3,3 Mo en tout, c'est acceptable. Vérifie juste si le repo impose Git LFS pour les binaires.
-
-Garde aussi une copie dans `tickets\DSI-51784\` pour la traçabilité du diagnostic.
-
-Pour la suppression des tests par réflexion sur `parseExifRotation` et `parseTiffOrientation` : d'accord, ce sont eux qui verrouillaient le bug. Mentionne-le dans la description du MR pour que le reviewer ne pense pas qu'on a perdu de la couverture.
+**Mon conseil : pas dans ce MR.** Le code actuel vient d'être validé, et c'est un changement de la couche d'entrée/sortie. Fais-le dans un MR séparé, idéalement avec la mesure de la tâche 20. Les tests sur les vrais fichiers iPhone et Samsung serviront de filet : s'ils restent verts avec le passage en mémoire, le changement est sûr.
