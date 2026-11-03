@@ -1,11 +1,11 @@
-Utiliser Math.floorMod pour la normalisation
-En Java, (-ccw) % 360 reste négatif quand ccw est positif : par exemple ccw = 90 donne -90, pas 270. Il faut écrire Math.floorMod((int) Math.round(-ccw), 360). Le round compte aussi, car av_display_rotation_get renvoie un double (89,9999… arrive).
+Les quatre ajustements sont bien intégrés et corrects. `R = flipH·M` est juste, puisque flipH est sa propre inverse. **Le plan v2.1 est prêt.**
 
-2. Utiliser la même convention de miroir dans les deux tables
-La table EXIF ignore le miroir avec la règle affichage = flipH ∘ R. La table de la matrice (déterminant -1) doit utiliser exactement la même décomposition, flipH et non flipV. Sinon, un même fichier avec miroir sortira à 180° d'écart selon la source utilisée. Un test croisé suffit : orientation EXIF 4 et matrice équivalente donnent la même rotation.
+Il reste deux détails techniques sur le point 4, à faire préciser au passage :
 
-3. Fixer une priorité explicite entre grille et stream
-Il lit maintenant aux deux niveaux, très bien. Mais il faut écrire la règle : pour une grille, le groupe prime, et on ne cumule jamais les deux. Il faut aussi appliquer la rotation au canvas assemblé, pas tuile par tuile.
+**1. L'ordre des octets en lisant la matrice**
+La display matrix contient 9 `int32` en **ordre natif** (little-endian sur x86). Si elle est lue via un `ByteBuffer` Java, l'ordre par défaut est big-endian. Sans `.order(ByteOrder.nativeOrder())`, les coefficients sont illisibles, et la table des 8 cas, qui repose justement sur ces coefficients bruts, se trompe silencieusement. Il faut l'écrire dans le plan et le couvrir par le test de contrat.
 
-4. Ne plus appeler getDisplayRotation()
-Comme il renvoie 0 dans les deux cas (absent ou présent à 0), le critère de présence impose de lire directement la side data via codecpar().coded_side_data() et AV_PKT_DATA_DISPLAYMATRIX. C'est sûrement son intention, mais autant que ce soit écrit dans le plan.
+**2. Choisir un seul chemin de lecture pour le stream**
+Le plan mentionne `getVideoSideData("Display Matrix")` **ou** `codecpar().coded_side_data()`. Je retiendrais le second, avec la constante `AV_PKT_DATA_DISPLAYMATRIX`, comme pour la grille. La clé texte `"Display Matrix"` dépend du nom renvoyé par FFmpeg et peut changer d'une version à l'autre. Un seul chemin, identique pour le stream et la grille, c'est aussi moins de code.
+
+Ensuite, tu peux donner le **GO** et déposer les deux HEIC portrait (iPhone et Samsung) dans `tickets\DSI-51784\`. C'est la seule chose qui bloque encore la tâche 3.
